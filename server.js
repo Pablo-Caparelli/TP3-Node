@@ -119,35 +119,32 @@ server.delete("/products/:id", async (req, res) => {
   }
 });
 
-// server.put("/products/:id", (req, res) => {
-//   const { id } = req.params;
-//   const { name, price } = req.body;
+server.put("/products/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const body = req.body;
 
-//   const index = products.findIndex((p) => p.id === id);
+    const product = await Product.findByIdAndUpdate(id, body, {
+      new: true,
+      runValidators: true,
+    });
 
-//   if (index === -1) {
-//     return res.status(404).json({ message: "Producto no encontrado" });
-//   }
+    if (!product) {
+      return res.status(404).json({
+        message: "Producto no encontrado",
+      });
+    }
 
-//   if (!name || !price) {
-//     return res
-//       .status(400)
-//       .json({ message: "La información de name y price debe estar completa" });
-//   }
-
-//   const updatedProduct = {
-//     id,
-//     name,
-//     price,
-//   };
-
-//   products[index] = updatedProduct;
-
-//   res.json({
-//     message: "Producto actualizado correctamente",
-//     product: updatedProduct,
-//   });
-// });
+    res.json({
+      message: "Producto actualizado correctamente",
+      product,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+});
 
 server.listen(3000, () => {
   connectMongoDb();
