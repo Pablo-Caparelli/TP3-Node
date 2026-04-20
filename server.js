@@ -36,12 +36,6 @@ const Product = mongoose.model("Product", productSchema);
 const server = express();
 server.use(express.json());
 
-// let products = [
-//   { name: "Laptop", price: 1200, available: true },
-//   { name: "Mouse", price: 25, available: true },
-//   { name: "Teclado", price: 80, available: true },
-// ];
-
 server.get("/products", async (req, res) => {
   try {
     const products = await Product.find();
@@ -53,17 +47,25 @@ server.get("/products", async (req, res) => {
   }
 });
 
-// server.get("/products/:id", (req, res) => {
-//   const { id } = req.params;
+server.get("/products/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
 
-//   const product = products.find((p) => p.id.trim() === id.trim());
+    const product = await Product.findById(id);
 
-//   if (!product) {
-//     return res.status(404).json({ message: "Producto no encontrado" });
-//   }
+    if (!product) {
+      return res.status(404).json({
+        message: "Producto no encontrado",
+      });
+    }
 
-//   res.json(product);
-// });
+    res.json(product);
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+});
 
 server.post("/products", async (req, res) => {
   try {
