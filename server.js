@@ -38,12 +38,19 @@ server.use(express.json());
 
 // let products = [
 //   { name: "Laptop", price: 1200, available: true },
-//   { name: "Mouse", price: 25 },
-//   { name: "Teclado", price: 80 },
+//   { name: "Mouse", price: 25, available: true },
+//   { name: "Teclado", price: 80, available: true },
 // ];
 
-server.get("/products", (req, res) => {
-  res.json(products);
+server.get("/products", async (req, res) => {
+  try {
+    const products = await Product.find();
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
 });
 
 // server.get("/products/:id", (req, res) => {
@@ -58,28 +65,34 @@ server.get("/products", (req, res) => {
 //   res.json(product);
 // });
 
-// server.post("/products", (req, res) => {
-//   const { name, price } = req.body;
+server.post("/products", async (req, res) => {
+  try {
+    const { name, price, available } = req.body;
 
-//   if (!name || !price) {
-//     return res
-//       .status(400)
-//       .json({ message: "La información de name y price debe estar completa" });
-//   }
+    // validación
+    if (!name || !price) {
+      return res.status(400).json({
+        message: "La información de name y price debe estar completa",
+      });
+    }
 
-//   const newProduct = {
-//     id: crypto.randomUUID(),
-//     name,
-//     price,
-//   };
+    // crear producto
+    const newProduct = await Product.create({
+      name,
+      price,
+      available, // opcional, usa default si no viene
+    });
 
-//   products.push(newProduct);
-
-//   res.status(201).json({
-//     message: "Producto agregado correctamente",
-//     product: newProduct,
-//   });
-// });
+    res.status(201).json({
+      message: "Producto agregado correctamente",
+      product: newProduct,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+});
 
 // server.delete("/products/:id", (req, res) => {
 //   const { id } = req.params;
