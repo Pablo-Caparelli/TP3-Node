@@ -96,22 +96,28 @@ server.post("/products", async (req, res) => {
   }
 });
 
-// server.delete("/products/:id", (req, res) => {
-//   const { id } = req.params;
+server.delete("/products/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
 
-//   const product = products.find((p) => p.id === id);
+    const product = await Product.findByIdAndDelete(id);
 
-//   if (!product) {
-//     return res.status(404).json({ message: "Producto no encontrado" });
-//   }
+    if (!product) {
+      return res.status(404).json({
+        message: "Producto no encontrado",
+      });
+    }
 
-//   products = products.filter((p) => p.id !== id);
-
-//   res.json({
-//     message: "Producto eliminado correctamente",
-//     product: product,
-//   });
-// });
+    res.json({
+      message: "Producto eliminado correctamente",
+      product,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+});
 
 // server.put("/products/:id", (req, res) => {
 //   const { id } = req.params;
