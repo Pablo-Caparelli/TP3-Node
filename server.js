@@ -1,9 +1,12 @@
 import express from "express";
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const connectMongoDb = async () => {
   try {
-    await mongoose.connect("mongodb://127.0.0.1:27017/db_tp3_node");
+    await mongoose.connect(process.env.MONGO_URI);
     console.log("✅ Conectado a MongoDB con éxito");
   } catch (error) {
     console.log(error.message);
@@ -146,7 +149,9 @@ server.put("/products/:id", async (req, res) => {
   }
 });
 
-server.listen(3000, () => {
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
   connectMongoDb();
-  console.log(`✅ Servidor en escucha http://localhost:3000`);
+  console.log(`✅ Servidor en escucha http://localhost:${PORT}`);
 });
